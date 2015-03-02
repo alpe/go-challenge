@@ -1,6 +1,7 @@
 package drum
 
 import (
+	"bytes"
 	"fmt"
 	"path"
 	"testing"
@@ -8,8 +9,8 @@ import (
 
 func TestDecodeFile(t *testing.T) {
 	tData := []struct {
-		path   string
-		output string
+		fileName string
+		output   string
 	}{
 		{"pattern_1.splice",
 			`Saved with HW Version: 0.808-alpha
@@ -61,15 +62,25 @@ Tempo: 999
 	}
 
 	for _, exp := range tData {
-		decoded, err := DecodeFile(path.Join("fixtures", exp.path))
+		decoded, err := DecodeFile(path.Join("fixtures", exp.fileName))
 		if err != nil {
-			t.Fatalf("something went wrong decoding %s - %v", exp.path, err)
+			t.Fatalf("something went wrong decoding %s - %v", exp.fileName, err)
 		}
 		if fmt.Sprint(decoded) != exp.output {
 			t.Logf("decoded:\n%#v\n", fmt.Sprint(decoded))
 			t.Logf("expected:\n%#v\n", exp.output)
 			t.Fatalf("%s wasn't decoded as expect.\nGot:\n%s\nExpected:\n%s",
-				exp.path, decoded, exp.output)
+				exp.fileName, decoded, exp.output)
 		}
+	}
+}
+
+func TestInvalidFileFormat(t *testing.T) {
+	p, err := decode(bytes.NewBufferString("Invalid Type Header"))
+	if err != ErrUnsupportedFileFormat {
+		t.Logf("expected error '%s' but got '%s'", ErrUnsupportedFileFormat, err)
+	}
+	if p != nil {
+		t.Logf("patter should be nil but was: '%v'", p)
 	}
 }
