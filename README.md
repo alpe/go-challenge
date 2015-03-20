@@ -5,6 +5,9 @@ The goal of this challenge is to write a binary decoder that given a binary back
 outputs the same printouts as in the [challenge](./challenge.md) defined. See
 http://golang-challenge.com/go-challenge1/ for full description.
 
+Update:
+All submissions are now available on [github](https://github.com/GoChallenge/GCSolutions)
+
 ## Getting started
 This example does not provide or generate any executable.
 To run the tests:
