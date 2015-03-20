@@ -15,8 +15,8 @@ const (
 // String returns the Pattern in the printout format as a string.
 func (p Pattern) String() string {
 	w := new(bytes.Buffer)
-	w.WriteString(fmt.Sprintf("Saved with HW Version: %s\n", p.version))
-	w.WriteString(fmt.Sprintf("Tempo: %v\n", p.tempo))
+	fmt.Fprintf(w, "Saved with HW Version: %s\n", p.version)
+	fmt.Fprintf(w, "Tempo: %v\n", p.tempo)
 	for _, v := range p.tracks {
 		appendTrack(w, *v)
 	}
@@ -24,7 +24,7 @@ func (p Pattern) String() string {
 }
 
 func appendTrack(w *bytes.Buffer, t Track) {
-	w.WriteString(fmt.Sprintf("(%v) %v\t", t.id, t.name))
+	fmt.Fprintf(w, "(%v) %v\t", t.id, t.name)
 	appendSteps(w, t.steps)
 	w.WriteString("\n")
 }
