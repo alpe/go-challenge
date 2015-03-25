@@ -1,0 +1,77 @@
+Go Challenge #1
+http://golang-challenge.com/
+
+25 Mar 2015
+
+
+Alex Peters
+@alpe1
+
+
+* What is the Go Challenge
+.image JOSHSoftware_LogoStack_.png 
+
+- Monthly programming challenge
+- Open to individuals not groups
+
+* Motivation
+
+- Hands on learning the language
+- Small isolated problem to solve
+- Feedback from experts
+- Out of the day to day programmer routine
+
+
+* Prizes
+- Gift Cards
+- Books + eBooks
+- T-shirts, stickers, ...
+- Interview with the winner
+.image gopher.png 
+
+* How does it work
+- A new Go Challenge every [[http://golang-challenge.com/][1st of month]]
+- Code -> Zip -> Email to [[mailto:gochallenge@joshsoftware.com][gochallenge@joshsoftware.com ]]
+- Re-submit allowed < deadline
+- Challenge author selects the winners
+# keep deadline in mind, timezone
+
+* The first Go Challenge
+.link http://golang-challenge.com/go-challenge1/
+.image measure.png
+
+#.image hex.png
+# Help: Forum/ golang-challenge channel on slack
+
+* Submissions
+- 173 entries from 41 countries
+- [[https://github.com/GoChallenge/GCSolutions/tree/master/march15][All available on Github]]
+
+
+  "I think the most important mistake was that people didn't keep it simple." 
+.caption [[http://golang-challenge.com/evaluator-feedback/][Dominik Honnef]]
+
+* The winners
+
+[[https://github.com/GoChallenge/GCSolutions/tree/master/march15/normal/luke-champine][Luke Champine]] & [[https://github.com/GoChallenge/GCSolutions/tree/master/march15/extra/jeremy-jay/stridatum-go-challenge-1-8f32f9a76497][Jeremy Jay]]
+
+.image fancygopher.jpg
+
+* Others worth to look
+
+[[https://github.com/GoChallenge/GCSolutions/blob/master/march15/just-for-fun/francisco-campoy-flores][Francesc Campoy]]
+[[https://github.com/dominikh/go-challenge-solutions][Dominik Honnef]]
+[[https://github.com/GoChallenge/GCSolutions/tree/master/march15/normal/doug-cichon][Doug Cichon]]
+
+[[https://medium.com/@jlouis666/solving-the-go-challenge-1-in-erlang-8b1e0a0a5044][Erlang Solution]]
+[[https://github.com/cemcatik/golang-challenge-1-drum_machine-scala][Scala Solution]]
+
+
+* Next 
+The (#2) challenge by Guillaume J. Charmes is scheduled for 1st Apr. 2015.
+
+- [[http://golang-challenge.com]]
+- [[https://twitter.com/golangchallenge][@golangchallenge]]
+.image gopher_go-challenge.png
+
+.caption _Gophers_ by [[http://www.reneefrench.com][Renée French]]
