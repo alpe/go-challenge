@@ -38,7 +38,7 @@ func decode(r io.Reader) (*Pattern, error) {
 	return decodePattern(p)
 }
 
-func newPayloadReader(r io.Reader) (payloadReader io.Reader, error error) {
+func newPayloadReader(r io.Reader) (*io.LimitedReader, error) {
 	typeHeader, err := readBytes(r, typeHeaderLength)
 	if err != nil {
 		return nil, err
@@ -51,10 +51,10 @@ func newPayloadReader(r io.Reader) (payloadReader io.Reader, error error) {
 		return nil, err
 	}
 
-	return io.LimitReader(r, payloadSize), nil
+	return &io.LimitedReader{r, payloadSize}, nil
 }
 
-func decodePattern(r io.Reader) (*Pattern, error) {
+func decodePattern(r *io.LimitedReader) (*Pattern, error) {
 	v, err := readBytes(r, maxVersionLength)
 	if err != nil {
 		return nil, err
@@ -71,14 +71,11 @@ func decodePattern(r io.Reader) (*Pattern, error) {
 	return &Pattern{version, tempo, tracks}, nil
 }
 
-func decodeTracks(r io.Reader) ([]*Track, error) {
+func decodeTracks(r *io.LimitedReader) ([]*Track, error) {
 	var tracks []*Track
-	for {
+	for r.N > 0 {
 		tr, err := decodeSingleTrack(r)
 		if err != nil {
-			if err == io.EOF {
-				break
-			}
 			return nil, err
 		}
 		tracks = append(tracks, tr)
