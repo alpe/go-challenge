@@ -84,3 +84,23 @@ func TestInvalidFileFormat(t *testing.T) {
 		t.Logf("patter should be nil but was: '%v'", p)
 	}
 }
+
+func TestCropToString(t *testing.T) {
+	testCases := []struct {
+		in  []byte
+		exp string
+	}{
+		{[]byte("foo"), "foo"},
+		{[]byte{102, 111, 111, 0, 0, 0}, "foo"},
+	}
+	for _, testCase := range testCases {
+		got := cropToString(testCase.in)
+		if got != testCase.exp {
+			t.Errorf("Expected '%v' but got '%v' for input '%v'", testCase.exp, got, testCase.in)
+		}
+		if len(got) != len(testCase.exp) {
+			t.Errorf("Expected len '%v' but got '%v' for input '%v'", len(testCase.exp), len(got), testCase.in)
+		}
+	}
+
+}

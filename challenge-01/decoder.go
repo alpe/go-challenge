@@ -57,60 +57,45 @@ func newPayloadReader(r io.Reader) (*io.LimitedReader, error) {
 }
 
 func decodePattern(r *io.LimitedReader) (*Pattern, error) {
+	var pattern Pattern
 	v, err := readBytes(r, maxVersionLength)
 	if err != nil {
 		return nil, fmt.Errorf("parse version: %v", err)
 	}
-	version := cropToString(v)
-	var tempo float32
-	if err := binary.Read(r, binary.LittleEndian, &tempo); err != nil {
+	pattern.version = cropToString(v)
+
+	if err := binary.Read(r, binary.LittleEndian, &pattern.tempo); err != nil {
 		return nil, fmt.Errorf("parse tempo: %v", err)
 	}
-	tracks, err := decodeTracks(r)
-	if err != nil {
-		return nil, err
-	}
-	return &Pattern{version, tempo, tracks}, nil
-}
-
-func decodeTracks(r *io.LimitedReader) ([]*Track, error) {
-	var tracks []*Track
 	for r.N > 0 {
-		tr, err := decodeSingleTrack(r)
+		tr, err := decodeTrack(r)
 		if err != nil {
 			return nil, err
 		}
-		tracks = append(tracks, tr)
+		pattern.tracks = append(pattern.tracks, tr)
 	}
-	return tracks, nil
+	return &pattern, nil
 }
 
-func decodeSingleTrack(r io.Reader) (*Track, error) {
-	var trackID uint32
-	if err := binary.Read(r, binary.LittleEndian, &trackID); err != nil {
+func decodeTrack(r io.Reader) (*Track, error) {
+	var track Track
+	if err := binary.Read(r, binary.LittleEndian, &track.id); err != nil {
 		return nil, fmt.Errorf("parse track id: %v", err)
 	}
-	name, err := decodeTrackName(r)
-	if err != nil {
-		return nil, err
-	}
-	steps, err := decodeSteps(r)
-	if err != nil {
-		return nil, err
-	}
-	return &Track{trackID, name, steps}, nil
-}
-
-func decodeTrackName(r io.Reader) (string, error) {
 	var lenName uint8
 	if err := binary.Read(r, binary.LittleEndian, &lenName); err != nil {
-		return "", fmt.Errorf("parse track name length: %v", err)
+		return nil, fmt.Errorf("parse track name length: %v", err)
 	}
 	b, err := readBytes(r, lenName)
 	if err != nil {
-		return "", fmt.Errorf("parse track name: %v", err)
+		return nil, fmt.Errorf("parse track name: %v", err)
 	}
-	return string(b), nil
+	track.name = string(b)
+
+	if track.steps, err = decodeSteps(r); err != nil {
+		return nil, err
+	}
+	return &track, nil
 }
 
 func decodeSteps(r io.Reader) (Steps, error) {
@@ -120,10 +105,7 @@ func decodeSteps(r io.Reader) (Steps, error) {
 		return steps, fmt.Errorf("parse steps: %v", err)
 	}
 	for i, v := range stepsAsBytes {
-		steps[i], err = byteToBool(v)
-		if err != nil {
-			return steps, err
-		}
+		steps[i] = (v == 1)
 	}
 	return steps, nil
 }
@@ -138,4 +120,14 @@ func readBytes(r io.Reader, n uint8) ([]byte, error) {
 		return nil, err
 	}
 	return buf, nil
+}
+
+const endOfString = 0x00
+
+func cropToString(b []byte) string {
+	n := bytes.Index(b, []byte{endOfString})
+	if n < 0 {
+		n = len(b)
+	}
+	return string(b[:n])
 }
