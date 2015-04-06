@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 )
@@ -41,14 +42,15 @@ func decode(r io.Reader) (*Pattern, error) {
 func newPayloadReader(r io.Reader) (*io.LimitedReader, error) {
 	typeHeader, err := readBytes(r, typeHeaderLength)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse type header: %v", err)
 	}
 	if !bytes.Equal(typeHeader, []byte(spliceTypePattern)) {
 		return nil, ErrUnsupportedFileFormat
 	}
 	var payloadSize int64
 	if err := binary.Read(r, binary.BigEndian, &payloadSize); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse payload size: %v", err)
+
 	}
 
 	return &io.LimitedReader{r, payloadSize}, nil
@@ -57,12 +59,12 @@ func newPayloadReader(r io.Reader) (*io.LimitedReader, error) {
 func decodePattern(r *io.LimitedReader) (*Pattern, error) {
 	v, err := readBytes(r, maxVersionLength)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse version: %v", err)
 	}
 	version := cropToString(v)
 	var tempo float32
 	if err := binary.Read(r, binary.LittleEndian, &tempo); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse tempo: %v", err)
 	}
 	tracks, err := decodeTracks(r)
 	if err != nil {
@@ -86,7 +88,7 @@ func decodeTracks(r *io.LimitedReader) ([]*Track, error) {
 func decodeSingleTrack(r io.Reader) (*Track, error) {
 	var trackID uint32
 	if err := binary.Read(r, binary.LittleEndian, &trackID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse track id: %v", err)
 	}
 	name, err := decodeTrackName(r)
 	if err != nil {
@@ -102,11 +104,11 @@ func decodeSingleTrack(r io.Reader) (*Track, error) {
 func decodeTrackName(r io.Reader) (string, error) {
 	var lenName uint8
 	if err := binary.Read(r, binary.LittleEndian, &lenName); err != nil {
-		return "", err
+		return "", fmt.Errorf("parse track name length: %v", err)
 	}
 	b, err := readBytes(r, lenName)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("parse track name: %v", err)
 	}
 	return string(b), nil
 }
@@ -115,7 +117,7 @@ func decodeSteps(r io.Reader) (Steps, error) {
 	var steps Steps
 	stepsAsBytes, err := readBytes(r, stepsLength)
 	if err != nil {
-		return steps, err
+		return steps, fmt.Errorf("parse steps: %v", err)
 	}
 	for i, v := range stepsAsBytes {
 		steps[i], err = byteToBool(v)
