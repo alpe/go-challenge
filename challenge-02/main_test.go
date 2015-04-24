@@ -68,6 +68,41 @@ func TestPartialMessageReads(t *testing.T) {
 	}
 }
 
+func TestShortMessageReads(t *testing.T) {
+	priv, pub := &[32]byte{'p', 'r', 'i', 'v'}, &[32]byte{'p', 'u', 'b'}
+
+	r, w := io.Pipe()
+	secureR := NewSecureReader(&shortReader{r}, priv, pub)
+	secureW := NewSecureWriter(w, priv, pub)
+
+	message := "hello world\n"
+	// Encrypt hello world
+	go func() {
+		fmt.Fprintf(secureW, message)
+		w.Close()
+	}()
+
+    buf := make([]byte, 1024)
+    n, err := secureR.Read(buf)
+    if err != nil {
+        t.Fatal(err)
+    }
+    buf = buf[:n]
+
+	// Make sure we have hello world back
+	if res := string(buf); res != "hello world\n" {
+		t.Fatalf("Unexpected result: %s != %s", res, "hello world")
+	}
+}
+
+type shortReader struct {
+    r io.Reader
+}
+
+func (s *shortReader) Read(buf []byte) (int, error) {
+    return s.r.Read(buf[0:1])
+}
+
 func TestSecureWriter(t *testing.T) {
 	priv, pub := &[32]byte{'p', 'r', 'i', 'v'}, &[32]byte{'p', 'u', 'b'}
 
